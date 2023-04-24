@@ -71,7 +71,7 @@ namespace SemesterProject
                     SqlConnection sqlCon = new SqlConnection(conStr);
 
                     sqlCon.Open();
-                    string query = "select holdloc, charge, trialdate, Trials.ssn, Arrests. dob, Arrests.[name]  from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn";
+                    string query = "select Trials.ssn, Arrests.[name], Arrests.dob, holdloc, charge, trialdate from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn";
                     SqlCommand cmd = new SqlCommand(query, sqlCon);
                     cmd.ExecuteNonQuery();
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -97,7 +97,7 @@ namespace SemesterProject
                     sqlCon.Open();
 
                     List<string> queryL = new List<string>();
-                    string query = "select * from (select holdloc, charge, trialdate, Trials.ssn, Arrests. dob, Arrests.[name]  from Trials left join Arrests on Arrests.ssn = Trials.ssn) as thing\r\nwhere ";
+                    string query = "select * from (select Trials.ssn, Arrests.[name], Arrests.dob, holdloc, charge, trialdate from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn) as thing\r\nwhere ";
                     if (_ssn.Text != "")
                     {
                         queryL.Add($"ssn = {_ssn.Text}");
@@ -167,7 +167,7 @@ namespace SemesterProject
             {
                 if (_ssn.Text == "" || hold_loc.Text == "" || tri_date.Text == "" || _char.Text == "")
                 {
-                    MessageBox.Show("You cannot leave empty fields!");
+                    MessageBox.Show("You cannot leave empty any of the fields listed above!");
                 }
                 else
                 {
@@ -175,29 +175,65 @@ namespace SemesterProject
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
-                    string insertTriQ = "insert into Trials values (@ssn, @holdloc, @charge, @tridate)";
-                    SqlCommand insertTri = new SqlCommand(insertTriQ, sqlCon);
-                    insertTri.CommandType = CommandType.Text;
-                    insertTri.Parameters.AddWithValue("@ssn", _ssn.Text) ;
-                    insertTri.Parameters.AddWithValue("@holdloc", hold_loc.Text);
-                    insertTri.Parameters.AddWithValue("@charge", _char.Text);
-                    insertTri.Parameters.AddWithValue("@tridate", tri_date.Text);
-                    insertTri.ExecuteNonQuery();
+                    string checkArrQ = "select count(*) from Arrests where ssn=@ssn";
+                    SqlCommand checkArr = new SqlCommand(checkArrQ, sqlCon);
+                    checkArr.CommandType = CommandType.Text;
+                    checkArr.Parameters.AddWithValue("@ssn", _ssn.Text);
+                    if (Convert.ToInt32(checkArr.ExecuteScalar()) > 0)
+                    {
+                        string insertTriQ = "insert into Trials values (@ssn, @holdloc, @charge, @tridate)";
+                        SqlCommand insertTri = new SqlCommand(insertTriQ, sqlCon);
+                        insertTri.CommandType = CommandType.Text;
+                        insertTri.Parameters.AddWithValue("@ssn", _ssn.Text);
+                        insertTri.Parameters.AddWithValue("@holdloc", hold_loc.Text);
+                        insertTri.Parameters.AddWithValue("@charge", _char.Text);
+                        insertTri.Parameters.AddWithValue("@tridate", tri_date.Text);
+                        insertTri.ExecuteNonQuery();
 
-                    string updateHoldLocsQ = "update Trials\r\nset holdloc= @holdloc where ssn = @ssn";
-                    SqlCommand updateHoldLocs = new SqlCommand(updateHoldLocsQ, sqlCon);
-                    updateHoldLocs.CommandType = CommandType.Text;
-                    updateHoldLocs.Parameters.AddWithValue("@holdloc", $"{hold_loc.Text}");
-                    updateHoldLocs.Parameters.AddWithValue("@ssn", _ssn.Text);
-                    updateHoldLocs.ExecuteNonQuery();
+                        string updateHoldLocsQ = "update Trials\r\nset holdloc= @holdloc where ssn = @ssn";
+                        SqlCommand updateHoldLocs = new SqlCommand(updateHoldLocsQ, sqlCon);
+                        updateHoldLocs.CommandType = CommandType.Text;
+                        updateHoldLocs.Parameters.AddWithValue("@holdloc", $"{hold_loc.Text}");
+                        updateHoldLocs.Parameters.AddWithValue("@ssn", _ssn.Text);
+                        updateHoldLocs.ExecuteNonQuery();
 
-                    MessageBox.Show("Action Complete!");
+                        MessageBox.Show("Action Complete!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("No person with this SSN found in Arrests record!");
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            SqlConnection sqlCon = new SqlConnection(conStr);
+            sqlCon.Open();
+
+            string updateCharQ = "update Trials set charge=@char where ssn=@ssn and trialdate=@tridate";
+
+            SqlCommand updateChar = new SqlCommand(updateCharQ, sqlCon);
+            updateChar.CommandType = CommandType.Text;
+            updateChar.Parameters.AddWithValue("@char", _char.Text);
+            updateChar.Parameters.AddWithValue("@ssn", _ssn.Text);
+            updateChar.Parameters.AddWithValue("@tridate", tri_date.Text);
+            updateChar.ExecuteNonQuery();
+
+            string updateHoldLocQ = "update Trials set holdloc=@holdloc  where ssn=@ssn";
+            SqlCommand updateHoldLoc = new SqlCommand(updateHoldLocQ, sqlCon);
+            updateHoldLoc.CommandType = CommandType.Text;
+            updateHoldLoc.Parameters.AddWithValue("@holdloc", hold_loc.Text);
+            updateHoldLoc.Parameters.AddWithValue("@ssn", _ssn.Text);
+            updateHoldLoc.ExecuteNonQuery();
+
+            MessageBox.Show("Action Complete!");
         }
     }
 }

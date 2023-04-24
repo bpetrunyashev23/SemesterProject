@@ -39,19 +39,7 @@ namespace SemesterProject
             findID.CommandType = CommandType.Text;
             int id = Convert.ToInt32(findID.ExecuteScalar());
 
-            string findRoleQ = "select role from Users where id=" + Convert.ToString(id);
-            SqlCommand findRole = new SqlCommand(findRoleQ, sqlCon);
-            findRole.CommandType = CommandType.Text;
-            string role = "";
-
-            if (Convert.ToInt32(findRole.ExecuteScalar()) == 1)
-            {
-                role = "Police officer";
-            }
-            else if (Convert.ToInt32(findRole.ExecuteScalar()) == 0)
-            {
-                role = "Prosecutor";
-            }
+            string role = "Prosecutor";
 
             ID_info.Text = $"ID: {id}\r\nRole: {role}";
 
