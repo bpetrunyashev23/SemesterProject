@@ -47,7 +47,7 @@ namespace SemesterProject
         {
             try
             {
-                string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                 if (int.TryParse(badge_num.Text, out int i) == false)
                 {
                     MessageBox.Show("You must enter a number!");

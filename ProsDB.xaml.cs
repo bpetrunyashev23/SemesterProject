@@ -31,7 +31,7 @@ namespace SemesterProject
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
 
-            string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
@@ -67,11 +67,11 @@ namespace SemesterProject
             {
                 if (_ssn.Text + _dob.Text + hold_loc.Text + tri_date.Text + _char.Text + _name.Text == "")
                 {
-                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                     SqlConnection sqlCon = new SqlConnection(conStr);
 
                     sqlCon.Open();
-                    string query = "select Trials.ssn, Arrests.[name], Arrests.dob, holdloc, charge, trialdate from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn";
+                    string query = "select distinct Trials.ssn, Arrests.[name], Arrests.dob, holdloc, charge, trialdate from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn";
                     SqlCommand cmd = new SqlCommand(query, sqlCon);
                     cmd.ExecuteNonQuery();
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -92,12 +92,12 @@ namespace SemesterProject
                 }
                 else
                 {
-                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
                     List<string> queryL = new List<string>();
-                    string query = "select * from (select Trials.ssn, Arrests.[name], Arrests.dob, holdloc, charge, trialdate from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn) as thing\r\nwhere ";
+                    string query = "select * from (select distinct Trials.ssn, Arrests.[name], Arrests.dob, holdloc, charge, trialdate from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn) as thing\r\nwhere ";
                     if (_ssn.Text != "")
                     {
                         queryL.Add($"ssn = {_ssn.Text}");
@@ -171,7 +171,7 @@ namespace SemesterProject
                 }
                 else
                 {
-                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
@@ -213,27 +213,35 @@ namespace SemesterProject
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
-            string updateCharQ = "update Trials set charge=@char where ssn=@ssn and trialdate=@tridate";
+            if (_char.Text != "")
+            {
+                string updateCharQ = "update Trials set charge=@char where ssn=@ssn and trialdate=@tridate";
 
-            SqlCommand updateChar = new SqlCommand(updateCharQ, sqlCon);
-            updateChar.CommandType = CommandType.Text;
-            updateChar.Parameters.AddWithValue("@char", _char.Text);
-            updateChar.Parameters.AddWithValue("@ssn", _ssn.Text);
-            updateChar.Parameters.AddWithValue("@tridate", tri_date.Text);
-            updateChar.ExecuteNonQuery();
+                SqlCommand updateChar = new SqlCommand(updateCharQ, sqlCon);
+                updateChar.CommandType = CommandType.Text;
+                updateChar.Parameters.AddWithValue("@char", _char.Text);
+                updateChar.Parameters.AddWithValue("@ssn", _ssn.Text);
+                updateChar.Parameters.AddWithValue("@tridate", tri_date.Text);
+                updateChar.ExecuteNonQuery();
 
-            string updateHoldLocQ = "update Trials set holdloc=@holdloc  where ssn=@ssn";
-            SqlCommand updateHoldLoc = new SqlCommand(updateHoldLocQ, sqlCon);
-            updateHoldLoc.CommandType = CommandType.Text;
-            updateHoldLoc.Parameters.AddWithValue("@holdloc", hold_loc.Text);
-            updateHoldLoc.Parameters.AddWithValue("@ssn", _ssn.Text);
-            updateHoldLoc.ExecuteNonQuery();
+                MessageBox.Show("Action Complete!");
+            }
 
-            MessageBox.Show("Action Complete!");
+            if (hold_loc.Text != "")
+            {
+                string updateHoldLocQ = "update Trials set holdloc=@holdloc  where ssn=@ssn";
+                SqlCommand updateHoldLoc = new SqlCommand(updateHoldLocQ, sqlCon);
+                updateHoldLoc.CommandType = CommandType.Text;
+                updateHoldLoc.Parameters.AddWithValue("@holdloc", hold_loc.Text);
+                updateHoldLoc.Parameters.AddWithValue("@ssn", _ssn.Text);
+                updateHoldLoc.ExecuteNonQuery();
+
+                MessageBox.Show("Action Complete!");
+            }
         }
     }
 }

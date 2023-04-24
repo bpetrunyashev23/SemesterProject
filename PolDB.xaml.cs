@@ -29,7 +29,7 @@ namespace SemesterProject
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
 
-            string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
@@ -58,7 +58,7 @@ namespace SemesterProject
             {
                 if (_ssn.Text + _dob.Text + _loc.Text + _date.Text + _reas.Text + _name.Text == "")
                 {
-                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                     SqlConnection sqlCon = new SqlConnection(conStr);
 
                     sqlCon.Open();
@@ -83,7 +83,7 @@ namespace SemesterProject
                 }
                 else
                 {
-                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
@@ -111,7 +111,7 @@ namespace SemesterProject
                     }
                     if (_reas.Text != "")
                     {
-                        queryL.Add($"reas = '{_reas.Text}'");
+                        queryL.Add($"reason = '{_reas.Text}'");
                         queryL.Add(" and ");
                     }
                     if (_name.Text != "")
@@ -163,7 +163,7 @@ namespace SemesterProject
                 }
                 else
                 {
-                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog = SemProject;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                    string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
