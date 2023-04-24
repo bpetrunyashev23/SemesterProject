@@ -21,6 +21,7 @@ namespace SemesterProject
     /// </summary>
     public partial class PolDBRes : Window
     {
+        public string role = "";
         public PolDBRes()
         {
             InitializeComponent();
@@ -41,7 +42,6 @@ namespace SemesterProject
             string findRoleQ = "select role from Users where id=" + Convert.ToString(id);
             SqlCommand findRole = new SqlCommand (findRoleQ, sqlCon);
             findRole.CommandType = CommandType.Text;
-            string role = "";
 
             if (Convert.ToInt32(findRole.ExecuteScalar()) == 1)
             {
@@ -63,9 +63,18 @@ namespace SemesterProject
 
         private void Return(object sender, RoutedEventArgs e)
         {
-            ProsPolDB prosStart = new ProsPolDB();
-            prosStart.Show();
-            this.Close();
+            if (role == "Police officer")
+            {
+                PolDB prosStart = new PolDB();
+                prosStart.Show();
+                this.Close();
+            }
+            else if (role == "Prosecutor")
+            {
+                ProsPolDB prosStart = new ProsPolDB();
+                prosStart.Show();
+                this.Close();
+            }    
         }
     }
 }
