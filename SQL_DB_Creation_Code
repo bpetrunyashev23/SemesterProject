@@ -1,0 +1,42 @@
+create database SemProject
+use SemProject
+go
+
+create table Users(
+id int primary key identity (1,1),
+password varchar(max),
+role bit,
+outID int
+)
+
+create table curUser(
+id int primary key
+)
+
+create table police_badges(
+badge_num int primary key
+)
+
+create table bar_ids(
+bar_id int primary key
+)
+
+create table Arrests(
+ssn int,
+dob date,
+loc varchar(max),
+arrdate date,
+reason varchar(max),
+name varchar(max)
+)
+
+create table Trials(
+ssn int,
+holdloc varchar(max),
+charge varchar(max),
+trialdate date
+)
+
+//Sample values needed to run program; you could enter other values but something must be inserted into these 2 tables
+insert into bar_ids values (111);
+insert into police_badges values (222);
