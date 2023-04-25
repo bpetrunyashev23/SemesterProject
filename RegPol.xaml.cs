@@ -79,8 +79,10 @@ namespace SemesterProject
                     outID.Parameters.AddWithValue("@num", badge_num.Text);
                     outID.Parameters.AddWithValue("@role", role);
 
+                    //If the police officer exists in police_badges and has not yet been registered
                     if (Convert.ToInt32(checkBadge.ExecuteScalar()) == 1 && Convert.ToInt32(outID.ExecuteScalar()) == 0)
                     {
+                        //string that will hold the password
                         string pass;
 
                         string unPassQ = "select count (*) from Users where password = @pass";
