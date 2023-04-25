@@ -25,6 +25,8 @@ namespace SemesterProject
         public PolDBRes()
         {
             InitializeComponent();
+
+            //Timer which updates the top-right textbox with the current time every second
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
@@ -34,6 +36,8 @@ namespace SemesterProject
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
+            //Commands to find role and id of user viewing the page
+            //This page may be viewed by both police officers and prosecutors, so the role must be checked based on the user id
             string findIDQ = "select id from curUser";
             SqlCommand findID = new SqlCommand(findIDQ, sqlCon);
             findID.CommandType = CommandType.Text;
@@ -43,6 +47,7 @@ namespace SemesterProject
             SqlCommand findRole = new SqlCommand (findRoleQ, sqlCon);
             findRole.CommandType = CommandType.Text;
 
+            //Updates the id & role text accordingly
             if (Convert.ToInt32(findRole.ExecuteScalar()) == 1)
             {
                 role = "Police officer";
@@ -56,6 +61,7 @@ namespace SemesterProject
 
             sqlCon.Close();
         }
+        //Timer tick event handler
         public void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             this._time.Text = DateTime.Now.ToString("dd/MM/yy\nHH:mm\nAbb 108");
@@ -63,12 +69,14 @@ namespace SemesterProject
 
         private void Return(object sender, RoutedEventArgs e)
         {
+            //Returns to police query page for police officers
             if (role == "Police officer")
             {
                 PolDB prosStart = new PolDB();
                 prosStart.Show();
                 this.Close();
             }
+            //Returns to police query page for prosecutors
             else if (role == "Prosecutor")
             {
                 ProsPolDB prosStart = new ProsPolDB();

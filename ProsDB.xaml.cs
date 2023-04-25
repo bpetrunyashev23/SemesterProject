@@ -26,6 +26,7 @@ namespace SemesterProject
         {
             InitializeComponent();
 
+            //Timer which updates the top-right textbox with the current time every second
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
@@ -35,18 +36,24 @@ namespace SemesterProject
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
+            //Finds curUser id
             string findIDQ = "select id from curUser";
             SqlCommand findIDs = new SqlCommand(findIDQ, sqlCon);
             findIDs.CommandType = CommandType.Text;
+
+            //Updates role & id text in the top-left
             ID_info.Text = $"ID: {Convert.ToString(findIDs.ExecuteScalar())} \r\nRole: Prosecutor";
 
             sqlCon.Close();
         }
+        //Timer tick event handler
         public void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             this._time.Text = DateTime.Now.ToString("dd/MM/yy\nHH:mm\nAbb 108");
         }
 
+
+        //Button to go to the police db query page for prosecutors
         private void Open_ProsPolDB(object sender, RoutedEventArgs e)
         {
             ProsPolDB prosStart = new ProsPolDB();
@@ -54,6 +61,7 @@ namespace SemesterProject
             this.Close();
         }
 
+        //Button to return to login
         private void Ret_Login(object sender, RoutedEventArgs e)
         {
             MainWindow login = new MainWindow();
@@ -65,6 +73,7 @@ namespace SemesterProject
         {
             try
             {
+                //If all fields have been left empty - show all records from the Trials table
                 if (_ssn.Text + _dob.Text + hold_loc.Text + tri_date.Text + _char.Text + _name.Text == "")
                 {
                     string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
@@ -86,6 +95,7 @@ namespace SemesterProject
                     MessageBox.Show("Successful loading");
                     sqlCon.Close();
 
+                    //Opens results window
                     displayQ.Show();
 
                     this.Close();
@@ -96,8 +106,13 @@ namespace SemesterProject
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
+                    //A list to hold all the conditions from fields that are not empty
                     List<string> queryL = new List<string>();
+
+                    //The initial query before the conditions are added
                     string query = "select * from (select distinct Trials.ssn, Arrests.[name], Arrests.dob, holdloc, charge, trialdate from Trials\r\nleft join Arrests on Arrests.ssn = Trials.ssn) as thing\r\nwhere ";
+
+                    //Checks which fields are not empty and adds their condition to the list
                     if (_ssn.Text != "")
                     {
                         queryL.Add($"ssn = {_ssn.Text}");
@@ -128,7 +143,11 @@ namespace SemesterProject
                         queryL.Add($"name = '{_name.Text}'");
                         queryL.Add(" and ");
                     }
+
+                    //Removes the last 'and' in the list
                     queryL.RemoveAt(queryL.Count - 1);
+
+                    //Updates the query with the specific conditions
                     foreach (var i in queryL)
                     {
                         query += i;
@@ -136,6 +155,7 @@ namespace SemesterProject
 
                     MessageBox.Show(query);
 
+                    //Queries db
                     SqlCommand cmd = new SqlCommand(query, sqlCon);
                     cmd.ExecuteNonQuery();
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -150,6 +170,7 @@ namespace SemesterProject
                     MessageBox.Show("Successful loading");
                     sqlCon.Close();
 
+                    //Opens results window
                     displayQ.Show();
 
                     this.Close();
@@ -165,6 +186,7 @@ namespace SemesterProject
         {
             try
             {
+                //Checks for empty fields
                 if (_ssn.Text == "" || hold_loc.Text == "" || tri_date.Text == "" || _char.Text == "")
                 {
                     MessageBox.Show("You cannot leave empty any of the fields listed above!");
@@ -175,10 +197,13 @@ namespace SemesterProject
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
+                    //Checks whether person with this ssn has been arrested
                     string checkArrQ = "select count(*) from Arrests where ssn=@ssn";
                     SqlCommand checkArr = new SqlCommand(checkArrQ, sqlCon);
                     checkArr.CommandType = CommandType.Text;
                     checkArr.Parameters.AddWithValue("@ssn", _ssn.Text);
+
+                    //Inserts a trial for the arrested person
                     if (Convert.ToInt32(checkArr.ExecuteScalar()) > 0)
                     {
                         string insertTriQ = "insert into Trials values (@ssn, @holdloc, @charge, @tridate)";
@@ -190,6 +215,8 @@ namespace SemesterProject
                         insertTri.Parameters.AddWithValue("@tridate", tri_date.Text);
                         insertTri.ExecuteNonQuery();
 
+                        //updates holding location of the person for every trial
+                        //they can only be in a single place at once (home arrest, prison, precinct, etc.)
                         string updateHoldLocsQ = "update Trials\r\nset holdloc= @holdloc where ssn = @ssn";
                         SqlCommand updateHoldLocs = new SqlCommand(updateHoldLocsQ, sqlCon);
                         updateHoldLocs.CommandType = CommandType.Text;
@@ -211,12 +238,14 @@ namespace SemesterProject
             }
         }
 
+        //Update button
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
+            //Updates the charge for a specific trials (based on ssn & trial date)
             if (_char.Text != "")
             {
                 string updateCharQ = "update Trials set charge=@char where ssn=@ssn and trialdate=@tridate";
@@ -231,6 +260,7 @@ namespace SemesterProject
                 MessageBox.Show("Action Complete!");
             }
 
+            //Updates the holding location of a single arrested person for all trials
             if (hold_loc.Text != "")
             {
                 string updateHoldLocQ = "update Trials set holdloc=@holdloc  where ssn=@ssn";

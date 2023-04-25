@@ -28,6 +28,8 @@ namespace SemesterProject
         public MainWindow()
         {
             InitializeComponent();
+
+            //Timer which updates the top-right textbox with the current time every second
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
@@ -43,10 +45,14 @@ namespace SemesterProject
             try 
             {
                 string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                
+                //Checks whether a number has been entered in the id box
                 if (int.TryParse(_id.Text, out int i) == false)
                 {
                     MessageBox.Show("Your ID must be a number!");
                 }
+
+                //Checks if the password box has been left empty
                 else if (_pass.Password == "")
                 {
                     MessageBox.Show("You need to enter a password!");
@@ -55,6 +61,8 @@ namespace SemesterProject
                 {
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
+
+                    //Checks whether a User with the entered role and credentials exists in the Users db
                     string query = "select count(*) from Users" +
                         " where id=@id and password=@pass and role=@role";
                     SqlCommand checkUser = new SqlCommand(query, sqlCon);
@@ -62,8 +70,11 @@ namespace SemesterProject
                     checkUser.Parameters.AddWithValue("@id", int.Parse(_id.Text));
                     checkUser.Parameters.AddWithValue("@pass", _pass.Password);
                     checkUser.Parameters.AddWithValue("@role", _role.SelectedIndex);
+                    
+                    //If the user exists
                     if (Convert.ToInt32(checkUser.ExecuteScalar()) == 1)
                     {
+                        //Updates the id of the current user with that of the one logging in
                         string curUQuery = "delete from curUser" +
                             "\r\ninsert into curUser values (@id)";
                         SqlCommand upCurU = new SqlCommand(curUQuery, sqlCon);
@@ -72,6 +83,7 @@ namespace SemesterProject
                         upCurU.ExecuteNonQuery();
                         sqlCon.Close();
 
+                        //Opens the database viewer for prosecutors
                         if (_role.SelectedIndex == 0)
                         {
                             ProsPolDB prosStart = new ProsPolDB();
@@ -79,6 +91,7 @@ namespace SemesterProject
                             this.Close();
                         }
 
+                        //Opens the database viewer for police officers
                         else if (_role.SelectedIndex == 1)
                         {
                             PolDB polStart = new PolDB();
@@ -98,6 +111,7 @@ namespace SemesterProject
             }
         }
 
+        //Button to open the new user registration window
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             try

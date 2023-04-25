@@ -136,7 +136,7 @@ namespace SemesterProject
 
                         sqlCon.Close();
                         
-                        //Show the registration completion window (which displays the user's id and password)
+                        //Show the registration completion window (which displays the user's id and password for them to write down)
                         CompleteReg regInfo = new CompleteReg();
                         regInfo.Show();
                         this.Close();

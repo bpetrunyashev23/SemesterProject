@@ -85,9 +85,12 @@ namespace SemesterProject
                         //string that will hold the password
                         string pass;
 
+                        //Command to check whether the password has already been assigned to another user
                         string unPassQ = "select count (*) from Users where password = @pass";
                         SqlCommand unPass = new SqlCommand(unPassQ, sqlCon);
                         unPass.CommandType = CommandType.Text;
+
+                        //Generates a random string of 7 lowercase letters
                         do
                         {
                             int length = 7;
@@ -97,12 +100,17 @@ namespace SemesterProject
                             {
                                 str_build.Append(Convert.ToChar(random.Next(97, 123)));
                             }
+
+                            //passes the string to the command as a parameter
                             pass = str_build.ToString();
                             unPass.Parameters.Clear();
                             unPass.Parameters.AddWithValue("@pass", pass);
                         }
+
+                        //generates a new password until it is unique for the Users table
                         while (Convert.ToInt32(unPass.ExecuteScalar()) != 0);
 
+                        //inserts the new user into the User table
                         string addUQ = "insert into Users values (@pass,@role,@outID)";
                         SqlCommand addU = new SqlCommand(addUQ, sqlCon);
                         addU.CommandType = CommandType.Text;
@@ -111,12 +119,16 @@ namespace SemesterProject
                         addU.Parameters.AddWithValue("@outID", Convert.ToInt32(badge_num.Text));
                         addU.ExecuteNonQuery();
 
+                        //since the User id is generated automatically by incrementing the previous User's id by 1
+                        //this command recovers the id from the table to display it to the User
                         string findIDQ = "select id from Users where password=@pass";
                         SqlCommand findID = new SqlCommand(@findIDQ, sqlCon);
                         findID.CommandType = CommandType.Text;
                         findID.Parameters.AddWithValue("@pass",pass);
                         string _id = Convert.ToString(findID.ExecuteScalar());
 
+
+                        //We will use the curUser table to store the id of the registered user to use it to recover their data in the next page
                         string curUQuery = "delete from curUser" +
                             "\r\ninsert into curUser values (@id)";
                         SqlCommand upCurU = new SqlCommand(curUQuery, sqlCon);
@@ -124,15 +136,21 @@ namespace SemesterProject
                         upCurU.Parameters.AddWithValue("@id", _id);
                         upCurU.ExecuteNonQuery();
 
+
+                        //Show the registration completion window (which displays the user's id and password for them to write down)
                         sqlCon.Close();
                         CompleteReg regInfo = new CompleteReg();
                         regInfo.Show();
                         this.Close();
                     }
+
+                    //Output if a police officer with this badge number has already been registered
                     else if (Convert.ToInt32(outID.ExecuteScalar()) != 0)
                     {
                         MessageBox.Show("This badge number has already been registered!");
                     }
+
+                    //Output if no prosecutor with this badge number has been found in the police_badges table
                     else
                     {
                         MessageBox.Show("Invalid badge number!");

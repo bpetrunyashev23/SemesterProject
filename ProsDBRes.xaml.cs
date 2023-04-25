@@ -25,6 +25,7 @@ namespace SemesterProject
         {
             InitializeComponent();
 
+            //Timer which updates the top-right textbox with the current time every second
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
@@ -34,6 +35,7 @@ namespace SemesterProject
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
+            //Finds curUser id
             string findIDQ = "select id from curUser";
             SqlCommand findID = new SqlCommand(findIDQ, sqlCon);
             findID.CommandType = CommandType.Text;
@@ -41,10 +43,13 @@ namespace SemesterProject
 
             string role = "Prosecutor";
 
+            //Updates id & role text in the top-left
             ID_info.Text = $"ID: {id}\r\nRole: {role}";
 
             sqlCon.Close();
         }
+
+        //Timer tick event handler
         public void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             this._time.Text = DateTime.Now.ToString("dd/MM/yy\nHH:mm\nAbb 108");
@@ -52,6 +57,7 @@ namespace SemesterProject
 
         private void Return(object sender, RoutedEventArgs e)
         {
+            //Returns to the prosecution query page
             ProsDB prosDBStart = new ProsDB();
             prosDBStart.Show();
             this.Close();

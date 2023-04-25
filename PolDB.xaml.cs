@@ -24,6 +24,8 @@ namespace SemesterProject
         public PolDB()
         {
             InitializeComponent();
+
+            //Timer which updates the top-right textbox with the current time every second
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
@@ -33,6 +35,7 @@ namespace SemesterProject
             SqlConnection sqlCon = new SqlConnection(conStr);
             sqlCon.Open();
 
+            //Updates the top-left textblock with the current user's id & role
             string findIDQ = "select id from curUser";
             SqlCommand findIDs = new SqlCommand(findIDQ, sqlCon);
             findIDs.CommandType = CommandType.Text;
@@ -40,11 +43,14 @@ namespace SemesterProject
 
             sqlCon.Close();
         }
+
+        //Timer tick event handler
         public void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             this._time.Text = DateTime.Now.ToString("dd/MM/yy\nHH:mm\nAbb 108");
         }
 
+        //Returns to login screen
         private void Ret_Login(object sender, RoutedEventArgs e)
         {
             MainWindow login = new MainWindow();
@@ -52,10 +58,12 @@ namespace SemesterProject
             this.Close();
         }
 
+        //Query button
         private void Query(object sender, RoutedEventArgs e)
         {
             try
             {
+                //If all fields have been left empty - show all records from the Arrests table
                 if (_ssn.Text + _dob.Text + _loc.Text + _date.Text + _reas.Text + _name.Text == "")
                 {
                     string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
@@ -77,6 +85,7 @@ namespace SemesterProject
                     MessageBox.Show("Successful loading");
                     sqlCon.Close();
 
+                    //Opens results window
                     displayQ.Show();
 
                     this.Close();
@@ -87,8 +96,13 @@ namespace SemesterProject
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
 
+                    //A list to hold all the conditions from fields that are not empty
                     List<string> queryL = new List<string>();
+
+                    //The initial query before the conditions are added
                     string query = "select * from Arrests where ";
+
+                    //Checks which fields are not empty and adds their condition to the list
                     if (_ssn.Text != "")
                     {
                         queryL.Add($"ssn = {_ssn.Text}");
@@ -119,7 +133,11 @@ namespace SemesterProject
                         queryL.Add($"name = '{_name.Text}'");
                         queryL.Add(" and ");
                     }
+
+                    //Removes the last 'and' in the list
                     queryL.RemoveAt(queryL.Count - 1);
+
+                    //Updates the query with the specific conditions
                     foreach (var i in queryL)
                     {
                         query += i;
@@ -127,6 +145,7 @@ namespace SemesterProject
 
                     MessageBox.Show(query);
 
+                    //Queries db
                     SqlCommand cmd = new SqlCommand(query, sqlCon);
                     cmd.ExecuteNonQuery();
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -139,8 +158,10 @@ namespace SemesterProject
                     adapter.Update(dt);
 
                     MessageBox.Show("Successful loading");
+
                     sqlCon.Close();
 
+                    //Opens results window
                     displayQ.Show();
 
                     this.Close();
@@ -172,6 +193,7 @@ namespace SemesterProject
                     SqlCommand checkArr = new SqlCommand(checkArrQ, sqlCon);
                     checkArr.CommandType = CommandType.Text;
                     checkArr.Parameters.AddWithValue("@ssn", _ssn.Text);
+
                     //If the person exists
                     if (Convert.ToInt32(checkArr.ExecuteScalar()) > 0)
                     {
@@ -182,6 +204,7 @@ namespace SemesterProject
                         checkPersDet.Parameters.AddWithValue("@ssn", _ssn.Text);
                         checkPersDet.Parameters.AddWithValue("@name", _name.Text);
                         checkPersDet.Parameters.AddWithValue("@dob", _dob.Text);
+
                         //If there is no match of the name or date of birth
                         if (Convert.ToInt32(checkPersDet.ExecuteScalar()) == 0)
                         {
@@ -189,6 +212,7 @@ namespace SemesterProject
                         }
                         else
                         {
+                            //Inserts new values
                             string insertArrQ = "insert into Arrests values (@ssn, @dob, @loc, @arrdate, @reason, @name)";
                             SqlCommand insertArr = new SqlCommand(insertArrQ, sqlCon);
                             insertArr.CommandType = CommandType.Text;
