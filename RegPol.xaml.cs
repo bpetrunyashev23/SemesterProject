@@ -64,7 +64,7 @@ namespace SemesterProject
                 else
                 {
 
-                    //Command to check whether a prosecutor with this badge num exists in the police_badges table
+                    //Command to check whether a police officer with this badge num exists in the police_badges table
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
                     string query = "select count(*) from police_badges where badge_num = @num";
