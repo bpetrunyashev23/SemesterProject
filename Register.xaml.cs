@@ -22,6 +22,8 @@ namespace SemesterProject
         public Register()
         {
             InitializeComponent();
+            
+            //Timer which updates the top-right textbox with the current time every second
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
@@ -32,6 +34,7 @@ namespace SemesterProject
             this._time.Text = DateTime.Now.ToString("dd/MM/yy\nHH:mm\nAbb 108");
         }
 
+        //Returns to login screen
         private void Ret_Login(object sender, RoutedEventArgs e)
         {
             MainWindow login = new MainWindow();
@@ -39,6 +42,7 @@ namespace SemesterProject
             this.Close();
         }
 
+        //Opens the registration window for prosecutors
         private void Pros_Role(object sender, RoutedEventArgs e)
         {
             RegPros regpros = new RegPros();
@@ -46,6 +50,7 @@ namespace SemesterProject
             this.Close();
         }
 
+        //Opens the registration window for police officers
         private void Pol_Role(object sender, RoutedEventArgs e)
         {
             RegPol regpol = new RegPol();
