@@ -22,10 +22,15 @@ namespace SemesterProject
     /// </summary>
     public partial class RegPol : Window
     {
+        //variable matches role column in the Users table; 1 = Police officer, 0 = Prosecutor
         static int role = 1;
+        
         public RegPol()
         {
             InitializeComponent();
+            
+
+            //Timer which updates the top-right text block with the current time every second
             System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
@@ -36,6 +41,7 @@ namespace SemesterProject
             this._time.Text = DateTime.Now.ToString("dd/MM/yy\nHH:mm\nAbb 108");
         }
 
+        //Returns to registration screen
         private void Return(object sender, RoutedEventArgs e)
         {
             Register reg = new Register();
@@ -43,11 +49,14 @@ namespace SemesterProject
             this.Close();
         }
 
+        //Attempts to register the new User
         private void Register(object sender, RoutedEventArgs e)
         {
             try
             {
                 string conStr = @"Data Source=DESKTOP-HD9RKJ8;Initial Catalog=Test;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+                
+                //Checks whether a number has been entered in badge num text box
                 if (int.TryParse(badge_num.Text, out int i) == false)
                 {
                     MessageBox.Show("You must enter a number!");
@@ -55,6 +64,7 @@ namespace SemesterProject
                 else
                 {
 
+                    //Command to check whether a prosecutor with this badge num exists in the police_badges table
                     SqlConnection sqlCon = new SqlConnection(conStr);
                     sqlCon.Open();
                     string query = "select count(*) from police_badges where badge_num = @num";
@@ -62,6 +72,7 @@ namespace SemesterProject
                     checkBadge.CommandType = CommandType.Text;
                     checkBadge.Parameters.AddWithValue("@num",badge_num.Text);
 
+                    //Command to check whether a police officer with this badge number has already been registered
                     string outIDQ = "select count(*) from Users where outID = @num and role=@role";
                     SqlCommand outID = new SqlCommand(outIDQ, sqlCon);
                     outID.CommandType = CommandType.Text;
